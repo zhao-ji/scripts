@@ -1,0 +1,3 @@
+再来一个 81662ff03de49cd3058f6fe95556951ad9a6f152 加盐SHA1的hash，盐是twitter，在后面，谁有空谁解吧，能值回电费。。。。
+
+發一個支付寶紅包。口令（8位純數字）bcrypt N=16： $2a$16$deGDy1I0Mf.NesPlzAWLm.aZH0znfMIxd4J65dJ4Jc3cvkYtkkr3i
