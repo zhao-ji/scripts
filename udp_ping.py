@@ -2,19 +2,11 @@
 # utf8
 
 from argparse import ArgumentParser
-from socket import gethostbyname
 from time import time
 
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import sr1, IP, UDP, DNS, DNSQR
-
-
-def get_ip(host):
-    if "".join(host.split(".")).isdigit():
-        return host
-    else:
-        return gethostbyname(host)
 
 
 def timestamp(need=1):
@@ -69,72 +61,60 @@ def standard_deviation(li):
 
 if __name__ == "__main__":
     parser = ArgumentParser(
-        description="publish your word",
+        description="udp ping",
         epilog="enjoy it!",
     )
-    parser.add_argument("host", help="the host you want to ping")
+    parser.add_argument(
+        "host",
+        help="the host you want to ping",
+    )
     parser.add_argument(
         "-p", "--port",
         type=int, default=53,
-        help='the port your want to ping'
+        help='the port your want to ping',
     )
     parser.add_argument(
         "-c", "--count",
         type=int, default=100,
-        help='how many ping packets do you send?'
+        help='how many ping packets do you want to send?',
+    )
+    parser.add_argument(
+        "-q", "--query",
+        type=str, default="www.baidu.com",
+        help='which host do you want to query?',
     )
     args = parser.parse_args()
 
-    try:
-        host_ip = get_ip(args.host)
-    except StandardError, err:
-        print "please check your domain name."
-        raise SystemExit
-    else:
-        print "PING {host} {host_ip} by UDP".format(
-            host=args.host,
-            host_ip=host_ip,
-        )
+    print "PING {} by UDP".format(args.host)
 
     rtt_list = list()
     actually_ping_count = 0
     start_time = time()
 
-    # ans = sr1(IP(dst=host_ip)/TCP(
-    #     dport=args.port, flags="S", seq=timestamp()),
-    #           verbose=0)
     for i in xrange(args.count):
         stamp_base, stamp_high = timestamp(need=2)
-        print "send", stamp_base, stamp_high
-        print "type", type(stamp_base), type(stamp_high)
         ans = sr1(
             IP(
-                dst=host_ip
+                dst=args.host,
             )/UDP(
                 sport=stamp_base,
                 dport=args.port,
             )/DNS(
                 rd=0,
                 id=stamp_high,
-                qd=DNSQR(qname="www.baidu.com"),
+                qd=DNSQR(qname=args.query),
             ),
             timeout=2,
             verbose=0,
         )
-        print 'recv', ans.dport, ans.id
-        print 'type', type(ans.dport), type(ans.id)
-        print 'now', timestamp(need=2)
-        print ("from {host_ip}: "
-               "udp_req={udp_req} "
-               "ttl={ttl} "
-               "time={time_on_road} ms"
-               ).format(
-                   host_ip=host_ip,
-                   udp_req=i,
-                   ttl=ans.ttl,
-                   time_on_road=time_on_the_road(ans.dport, ans.id),
-        )
-        rtt_list.append(time_on_the_road(ans.dport, ans.id))
+
+        spend = time_on_the_road(ans.dport, ans["DNS"].id)
+        print "from {host}: udp_req={udp_req} ttl={ttl} time={time_on_road}ms" \
+            .format(
+                host=args.host, udp_req=i,
+                ttl=ans.ttl, time_on_road=spend,
+            )
+        rtt_list.append(spend)
 
     print "\n--- {host} ping statistics ---".format(host=args.host)
     print ("{packets_total} packets transmitted, "
