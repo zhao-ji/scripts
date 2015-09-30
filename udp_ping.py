@@ -85,7 +85,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    print "PING {} by UDP".format(args.host)
+    print "\n\t--- PING {} by UDP ---\n".format(args.host)
 
     rtt_list = list()
     actually_ping_count = 0
@@ -116,7 +116,7 @@ if __name__ == "__main__":
             )
         rtt_list.append(spend)
 
-    print "\n--- {host} ping statistics ---".format(host=args.host)
+    print "\n\t--- {host} ping statistics ---\n".format(host=args.host)
     print ("{packets_total} packets transmitted, "
            "{packets_survival} received, "
            "0% packet loss, time {total_time}ms"
