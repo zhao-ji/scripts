@@ -17,12 +17,25 @@ def get_ip(host):
         return gethostbyname(host)
 
 
-def timestamp():
-    return int(str(int(time() * 100000))[-8:])
+def timestamp(need=1):
+    if need == 1:
+        return int(bin(int(time()*10**6))[-32:], 2)
+    elif need == 2:
+        return int(bin(int(time()*10**6))[-16:], 2), \
+            int(bin(int(time()*10**6))[-32:-16], 2)
 
 
-def time_on_the_road(stamp):
-    return (timestamp() - stamp + 1) / 100
+def time_on_the_road(stamp_base, stamp_high=0):
+    # if use udp ping, stamp split to two parts, each parts is 16 bit
+    # and if use tcp ping, stamp is 32 bits
+    stamp = stamp_high and stamp_high * 2 ** 16 + stamp_base or stamp_base
+
+    stamp_now = timestamp()
+    if stamp_now < stamp:
+        # the 32 bit stamp is overflow
+        stamp_now = stamp_now + 2 ** 32
+
+    return float(stamp_now - stamp) / (10 ** 3)
 
 
 def standard_deviation(li):
@@ -122,5 +135,5 @@ if __name__ == "__main__":
         min=min(rtt_list),
         avg=sum(rtt_list)/float(len(rtt_list)),
         max=max(rtt_list),
-        mdev=int(standard_deviation(rtt_list)),
+        mdev=standard_deviation(rtt_list),
     )
