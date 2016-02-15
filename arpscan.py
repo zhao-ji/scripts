@@ -21,7 +21,7 @@ if __name__ == "__main__":
     packets = Ether(
         dst="ff:ff:ff:ff:ff:ff", type=0x806,
     )/ARP(hwdst="ff:ff:ff:ff:ff:ff", pdst=args.hosts)
-    ans, unans = srp(packets, timeout=3, verbose=0)
+    ans, unans = srp(packets, timeout=10, verbose=0)
 
     mac_info_dict = {}
     with open("mac-company") as fuck:
