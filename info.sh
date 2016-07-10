@@ -88,3 +88,6 @@ echo -e "Amount Of Disks:\n${Disk}\n${Line}"
 #各挂载分区使用情况
 Partion=$(df -hlP |sed -n '2,$p')
 echo -e "Usage Of partions:\n${Partion}\n${Line}"
+
+
+echo 'fuck'
